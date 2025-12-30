@@ -3,10 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Библиотека</title>
+    <title>Библиотека - Нативный JS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 { color: #2c3e50; }
+        .output {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+    </style>
 </head>
 <body>
     <h1>Система управления библиотекой</h1>
-    <script type="module" src="index.js"></script>
+    <div id="output" class="output">Нажмите кнопки для запуска демонстрации...</div>
+    
+    <div>
+        <button onclick="runDemo()">Запустить демонстрацию</button>
+        <button onclick="testMethods()">Тестировать методы</button>
+        <button onclick="clearOutput()">Очистить вывод</button>
+    </div>
+
+    <script src="Library.js"></script>
+    <script src="BookLibrary.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
