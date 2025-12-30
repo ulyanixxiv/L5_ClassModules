@@ -1,82 +1,118 @@
-export class Library {
-    #name;
-    #booksCount;
-    #isOpen;
+// Родительский класс Библиотека
+function Library(name, booksCount, isOpen) {
+    // Приватные свойства (через замыкание)
+    var _name = name || "Библиотека";
+    var _booksCount = booksCount || 0;
+    var _isOpen = isOpen || false;
 
-    constructor(name = "библиотека", booksCount = 0, isOpen = false) {
-        this.#name = name;
-        this.#booksCount = booksCount;
-        this.#isOpen = isOpen;
-    }
+    // Геттеры и сеттеры
+    this.getName = function() {
+        return _name;
+    };
 
-
-    get name() {
-        return this.#name;
-    }
-
-    get booksCount() {
-        return this.#booksCount;
-    }
-
-    get isOpen() {
-        return this.#isOpen;
-    }
-    set name(value) {
+    this.setName = function(value) {
         if (typeof value === 'string' && value.length > 0) {
-            this.#name = value;
+            _name = value;
+            return true;
         } else {
-            console.error('название должно быть непустой строкой');
+            consoleLog('Ошибка: Название должно быть непустой строкой', 'error');
+            return false;
         }
-    }
+    };
 
-    set booksCount(value) {
+    this.getBooksCount = function() {
+        return _booksCount;
+    };
+
+    this.setBooksCount = function(value) {
         if (typeof value === 'number' && value >= 0) {
-            this.#booksCount = value;
+            _booksCount = value;
+            return true;
         } else {
-            console.error('количество книг должно быть неотрицательным числом');
+            consoleLog('Ошибка: Количество книг должно быть неотрицательным числом', 'error');
+            return false;
         }
-    }
+    };
 
-    set isOpen(value) {
+    this.getIsOpen = function() {
+        return _isOpen;
+    };
+
+    this.setIsOpen = function(value) {
         if (typeof value === 'boolean') {
-            this.#isOpen = value;
+            _isOpen = value;
+            return true;
         } else {
-            console.error('статус должен быть boolean');
+            consoleLog('Ошибка: Статус должен быть true или false', 'error');
+            return false;
         }
-    }
-    show() {
-        console.log(' информация о библиотеке');
-        console.log(`название: ${this.#name}`);
-        console.log(`количество книг: ${this.#booksCount}`);
-        console.log(`открыта: ${this.#isOpen ? 'да' : 'нет'}`);
+    };
+
+    // Условно-приватный метод (доступен только внутри класса)
+    function addBooks(count) {
+        if (typeof count === 'number' && count > 0) {
+            _booksCount += count;
+            return true;
+        }
+        return false;
     }
 
-    delete() {
-        this.#name = null;
-        this.#booksCount = null;
-        this.#isOpen = null;
+    // Публичные методы
+    this.show = function() {
+        var info = '=== Информация о библиотеке ===\n' +
+                  'Название: ' + _name + '\n' +
+                  'Количество книг: ' + _booksCount + '\n' +
+                  'Открыта: ' + (_isOpen ? 'Да' : 'Нет') + '\n' +
+                  '==============================';
+        consoleLog(info);
+        return info;
+    };
+
+    this.delete = function() {
+        // Удаляем все ссылки на внутренние данные
+        _name = null;
+        _booksCount = null;
+        _isOpen = null;
         
-        this.show = () => console.error('объект удален');
-        this.copy = () => console.error('объект удален');
+        // Переопределяем методы
+        this.show = function() {
+            consoleLog('ОШИБКА: Объект библиотеки удален', 'error');
+            return 'Объект удален';
+        };
         
-        console.log('библиотека удалена');
-    }
-    copy() {
+        this.copy = function() {
+            consoleLog('ОШИБКА: Объект библиотеки удален', 'error');
+            return null;
+        };
+        
+        consoleLog('✓ Библиотека успешно удалена');
+        return true;
+    };
+
+    this.copy = function() {
         return this;
-    }
-    #addBooks(count) {
-        if (typeof count === 'number' && count > 0) {
-            this.#booksCount += count;
-            console.log(`добавлено ${count} книг. всего книг: ${this.#booksCount}`);
+    };
+
+    // Публичный метод для доступа к условно-приватному
+    this.receiveDonation = function(booksCount) {
+        if (addBooks(booksCount)) {
+            consoleLog('✓ Получено в дар ' + booksCount + ' книг. Всего книг: ' + _booksCount);
+            return true;
+        } else {
+            consoleLog('Ошибка: Некорректное количество книг для добавления', 'error');
+            return false;
         }
-    }
-    receiveDonation(booksCount) {
-        this.#addBooks(booksCount);
-    }
-    static clone(original) {
-        if (original instanceof Library) {
-            return new Library(original.name, original.booksCount, original.isOpen);
-        }
-        return new Library();
-    }
+    };
 }
+
+// Статичный метод clone
+Library.clone = function(original) {
+    if (original instanceof Library) {
+        return new Library(
+            original.getName(),
+            original.getBooksCount(),
+            original.getIsOpen()
+        );
+    }
+    return new Library();
+};
