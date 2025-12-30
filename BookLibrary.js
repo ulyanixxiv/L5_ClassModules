@@ -1,52 +1,84 @@
-import { Library } from './Library.js';
-
-export class BookLibrary extends Library {
-    #specialization;
-
-    constructor(name = "библиотека", booksCount = 0, isOpen = false, specialization = "общая") {
-        super(name, booksCount, isOpen);
-        this.#specialization = specialization;
-    }
-    get specialization() {
-        return this.#specialization;
-    }
-    set specialization(value) {
+// Дочерний класс КнижнаяБиблиотека
+function BookLibrary(name, booksCount, isOpen, specialization) {
+    // Наследуем свойства родителя
+    Library.call(this, name, booksCount, isOpen);
+    
+    // Новое приватное свойство
+    var _specialization = specialization || "Общая";
+    
+    // Сохраняем оригинальные методы родителя
+    var parentShow = this.show;
+    var parentDelete = this.delete;
+    var parentCopy = this.copy;
+    
+    // Геттер и сеттер для specialization
+    this.getSpecialization = function() {
+        return _specialization;
+    };
+    
+    this.setSpecialization = function(value) {
         if (typeof value === 'string' && value.length > 0) {
-            this.#specialization = value;
+            _specialization = value;
+            return true;
         } else {
-            console.error('специализация должна быть непустой строкой');
+            consoleLog('Ошибка: Специализация должна быть непустой строкой', 'error');
+            return false;
         }
-    }
-    show() {
-        console.log('информация о книжной библиотеке');
-        console.log(`название: ${this.name}`);
-        console.log(`кол-во книг: ${this.booksCount}`);
-        console.log(`открыта: ${this.isOpen ? 'да' : 'нет'}`);
-        console.log(`специализация: ${this.#specialization}`);
-    }
-    delete() {
-        this.name = null;
-        this.booksCount = null;
-        this.isOpen = null;
-        this.#specialization = null;
+    };
+    
+    // Переопределяем метод show
+    this.show = function() {
+        var info = '=== Информация о книжной библиотеке ===\n' +
+                  'Название: ' + this.getName() + '\n' +
+                  'Количество книг: ' + this.getBooksCount() + '\n' +
+                  'Открыта: ' + (this.getIsOpen() ? 'Да' : 'Нет') + '\n' +
+                  'Специализация: ' + _specialization + '\n' +
+                  '=======================================';
+        consoleLog(info);
+        return info;
+    };
+    
+    // Переопределяем метод delete
+    this.delete = function() {
+        // Удаляем свойства дочернего класса
+        _specialization = null;
         
-        this.show = () => console.error('объект удален');
-        this.copy = () => console.error('объект удален');
+        // Вызываем метод delete родителя
+        parentDelete.call(this);
         
-        console.log('книжная библиотека удалена');
-    }
-    copy() {
+        consoleLog('✓ Книжная библиотека удалена');
+        return true;
+    };
+    
+    // Переопределяем метод copy
+    this.copy = function() {
         return this;
-    }
-    static clone(original) {
-        if (original instanceof BookLibrary) {
-            return new BookLibrary(
-                original.name, 
-                original.booksCount, 
-                original.isOpen, 
-                original.specialization
-            );
+    };
+    
+    // Новый метод для дочернего класса
+    this.changeSpecialization = function(newSpecialization) {
+        var oldSpec = _specialization;
+        if (this.setSpecialization(newSpecialization)) {
+            consoleLog('✓ Специализация изменена с "' + oldSpec + '" на "' + newSpecialization + '"');
+            return true;
         }
-        return new BookLibrary();
-    }
+        return false;
+    };
 }
+
+// Наследование (прототипное наследование)
+BookLibrary.prototype = Object.create(Library.prototype);
+BookLibrary.prototype.constructor = BookLibrary;
+
+// Статичный метод clone для BookLibrary
+BookLibrary.clone = function(original) {
+    if (original instanceof BookLibrary) {
+        return new BookLibrary(
+            original.getName(),
+            original.getBooksCount(),
+            original.getIsOpen(),
+            original.getSpecialization()
+        );
+    }
+    return new BookLibrary();
+};
